@@ -1,1 +1,3 @@
-# Introduction to Machine Learning - projects
+# Projects for Introduction to Machine Learning
+
+# Project 1 - Ridge regression with different penalties
