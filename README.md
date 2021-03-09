@@ -1,1 +1,1 @@
-# Introduction to Machine Learning projects
+# Introduction to Machine Learning - projects
