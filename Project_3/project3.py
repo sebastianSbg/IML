@@ -10,45 +10,36 @@ Neural Networks to predict protein activation
 * batch size
 * Neural Network (number of layers, where to put drop out layer, activations)
 * Optimizer, loss function for f1
+* implement progress bar
 """
-
+import logging
+import os
 import pandas as pd
-import numpy as np
 import tqdm
-
+import numpy as np
 import pickle
-# %tensorflow_version 2.x
+import re
 import tensorflow as tf
-# from tensorflow.python.util import deprec
-# deprecation._PRINT_DEPRECATION_WARNINGS = False
-
+# keras imports
 import keras
-import keras.backend as K
-from keras import Sequential
-
-from keras.layers import Dense, Dropout
-from keras.layers import BatchNormalization
-from keras.layers import AlphaDropout
-
-from keras import regularizers
+from keras.layers import Dense, Dropout, BatchNormalization, AlphaDropout
+from keras import initializers, Sequential, regularizers
+from keras import backend as K
 from keras.optimizers import SGD
 from keras.callbacks import Callback,ModelCheckpoint, EarlyStopping
-from keras import initializers
-
-from sklearn.preprocessing import OneHotEncoder
+# sklearn imports
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.model_selection import StratifiedKFold
 from sklearn import metrics
 from sklearn.metrics import classification_report
 from sklearn.utils import class_weight
-from sklearn.preprocessing import LabelEncoder
 
-from keras import backend as K
-# import keras.backend.tensorflow_backend as tfback
-
-from tensorflow.python.client import device_lib
-import os
-
-import re
+# %tensorflow_version 2.x
+from tensorflow.python.util import deprecation
+deprecation._PRINT_DEPRECATION_WARNINGS = False
+# # import keras.backend.tensorflow_backend as tfback
+# from tensorflow.python.client import device_lib
+#
 
 # def _get_available_gpus():
 
@@ -76,7 +67,6 @@ def get_f1(y_true, y_pred):
     precision = get_precision(y_true, y_pred)
     recall = get_recall(y_true, y_pred)
     return 2*((precision*recall)/(precision+recall+K.epsilon()))
-
 
 def macro_soft_f1(y, y_hat):
     """Compute the macro soft F1-score as a cost.
@@ -142,6 +132,20 @@ def f1_loss_3(y_true, y_pred):
     f1 = tf.where(tf.is_nan(f1), tf.zeros_like(f1), f1)
     return 1 - K.mean(f1)
 
+def myLogger(logLevel):
+    path = os.path.dirname(__file__)
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logLevel)
+    formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
+    file_handler_e = logging.FileHandler(f'{path}/log.log')
+    file_handler_e.setLevel(logging.INFO)
+    file_handler_e.setFormatter(formatter)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.DEBUG)
+    logger.addHandler(file_handler_e)
+    logger.addHandler(stream_handler)
+    return logger
+
 class Model_Connected():
     def __init__(self, hiddensize, seed):
         self.hiddensize = hiddensize
@@ -149,8 +153,10 @@ class Model_Connected():
 
         self.model = Sequential()
         self.model.add(Dense(HIDDENSIZE, input_dim = 80, activation='relu', kernel_initializer= initializers.lecun_normal(seed=SEED)))
+        self.model.add(Dropout(rate=0.1))
+        self.model.add(BatchNormalization())
         self.model.add(Dense(107, input_dim = HIDDENSIZE, activation='relu', kernel_initializer= initializers.lecun_normal(seed=SEED)))
-        self.model.add(Dropout(rate = 0.5))
+        self.model.add(Dropout(rate = 0.1))
         self.model.add(BatchNormalization())
         self.model.add(Dense(1, input_dim = 107, activation='sigmoid'))
 
@@ -166,87 +172,76 @@ class Model_Connected():
 
 if __name__ == "__main__":
     # defining global variables
-    NEPOCHS = 120
-    BATCHSIZE = 80
+    NEPOCHS = 200
+    BATCHSIZE = 50
     VALIDATIONSPLIT = 0.2
-    HIDDENSIZE = 80
-    SEED = 42
+    HIDDENSIZE = 200
+    SEED = 29
+    KFOLDSPLITS = 2
+    VERBOSE = True
+    LOGLEVEL = logging.DEBUG
+
+    # define logger
+    logger = myLogger(LOGLEVEL)
 
     """#### Load data & data inspection"""
     dat_train = pd.read_csv("./data/train.csv")
     dat_test = pd.read_csv("./data/test.csv")
-    # check class balance on activation
-    dat_train['Active'].value_counts()
+    logger.info(f"Pecenttage of active values: {np.round(100*dat_train['Active'].value_counts()/dat_train.shape[0],4)}")  # check class balance on activation
 
     """#### Pre-process data"""
-    train_seqs = [split_convert(i) for i in dat_train.iloc[:,0]]
+    train_seqs = [split_convert(i) for i in dat_train.iloc[:,0]]  # convestion not necessary
     train_labels = [i for i in dat_train.iloc[:,1]]
     test_seqs = [split_convert(i) for i in dat_test.iloc[:,0]]
 
-    kfold_splits = 10
-    folds = list(StratifiedKFold(n_splits=kfold_splits, shuffle=True, random_state=SEED).split(train_seqs, train_labels))
+    folds = list(StratifiedKFold(n_splits=KFOLDSPLITS, shuffle=True, random_state=SEED).split(train_seqs, train_labels))
 
-    """ binary/one-hot encoding"""
+    """ binary/one-hot encoding"""  #TODO: Check if it would be better to eliminate one hot encoding
     onehot_encoder = OneHotEncoder(sparse=False)
     train_seqs_onehot = onehot_encoder.fit_transform(train_seqs)
     test_seqs_onehot = onehot_encoder.transform(test_seqs)
 
     """ Create Model"""
-    model_i = Model_Connected(HIDDENSIZE, SEED)
-    model = model_i.compile()
+    model_inst = Model_Connected(HIDDENSIZE, SEED)
+    model = model_inst.compile()
     model.summary()
 
     best_fold = -1
     best_score = 0
     best_model = None
 
-    """ Train model and pick best fold, TODO:Add hyperparameters that change for each fold """
-    for index, (train_indices, val_indices) in enumerate(folds):
-        print("Training on fold " + str(index+1) + "/10...")
-        # Generate batches from indices
-        xtrain, xval = train_seqs_onehot[train_indices], train_seqs_onehot[val_indices]
-        #ytrain, yval = train_labels_onehot[train_indices], train_labels_onehot[val_indices]
-        ytrain = np.array(train_labels)[train_indices.astype(int)]
-        yval = np.array(train_labels)[val_indices.astype(int)]
-
-        # determine class imbalance
-        class_weights = class_weight.compute_class_weight('balanced', np.unique(train_labels), train_labels)
-        class_weight_dict = dict(enumerate(class_weights))
-
-        # train
-        model = model_i.compile()  # better way to just wipe model?
-        model.fit(xtrain, ytrain, validation_data = (xval, yval), epochs = NEPOCHS, batch_size=BATCHSIZE, verbose = 0 , class_weight = class_weight_dict)  # starts training
-
-        # predictions
-        y_pred = model.predict_classes(xval, batch_size=BATCHSIZE, verbose=1)
-        y_train = model.predict_classes(xtrain, batch_size=BATCHSIZE, verbose=1)
-        y_pred_bool = y_pred.astype(int)
-        tmp_score = metrics.f1_score(yval, y_pred)
-        score_train = metrics.f1_score(ytrain, y_train)
-        print("F1 score for this fold is : ", tmp_score, score_train)
-        if (tmp_score > best_score):
-            best_fold = index
-            best_model = model
-
-    """ train model on entire data set"""
-    # class weight for the train set
+    """Train Model"""
+    xtrain, xval = train_seqs_onehot, train_seqs_onehot
+    #ytrain, yval = train_labels_onehot[train_indices], train_labels_onehot[val_indices]
+    ytrain = np.array(train_labels)
+    yval = np.array(train_labels)
+    # determine class imbalance
+    logger.debug("Class imbalance start...")
     class_weights = class_weight.compute_class_weight('balanced', np.unique(train_labels), train_labels)
     class_weight_dict = dict(enumerate(class_weights))
-    model.fit(train_seqs_onehot,train_labels, validation_split=0, epochs = NEPOCHS, batch_size=BATCHSIZE, verbose = 0, class_weight = class_weight_dict)  # starts training
-
-    # Training Error
-    y_pred = model.predict_classes(train_seqs_onehot, batch_size=BATCHSIZE, verbose=1)
-    y_pred_bool = np.argmax(y_pred, axis=1)
-
-    print(classification_report(train_labels, y_pred))
+    logger.debug("Class imbalance end")
+    # train
+    logger.debug("Model compile start...")
+    model = model_inst.compile()
+    logger.debug("Model train start ...")
+    model.fit(xtrain, ytrain, validation_data = (xval, yval), epochs = NEPOCHS, batch_size=BATCHSIZE, verbose = VERBOSE , class_weight = class_weight_dict)  # starts training
+    # predictions
+    logger.debug("Model predictions start...")
+    y_pred = model.predict_classes(xval, batch_size=BATCHSIZE, verbose=1)
+    y_train = model.predict_classes(xtrain, batch_size=BATCHSIZE, verbose=1)
+    y_pred_bool = y_pred.astype(int)
+    tmp_score = metrics.f1_score(yval, y_pred)
+    score_train = metrics.f1_score(ytrain, y_train)
+    logger.info("F1 score for this fold is : ", tmp_score, score_train)
+    best_model = model
 
     """#### Prediction on test data"""
-    y_pred = model.predict_classes(test_seqs_onehot, batch_size=BATCHSIZE,verbose = 1)
-    print(np.sum(y_pred))
-    res = pd.dataFrame(y_pred)
+    y_pred = best_model.predict_classes(test_seqs_onehot, batch_size=BATCHSIZE,verbose = VERBOSE)
+    logger.info(np.sum(y_pred))
+    res = pd.DataFrame(y_pred)
 
     """ Save results"""
-    import time, datetime
-    timestamp = int(datetime.datetime.now())
+    import time
+    timestamp = int(time.time())
     res.to_csv(f"./results/results_{timestamp}.csv", index=False, header=False)
 

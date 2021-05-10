@@ -1,0 +1,52 @@
+2021-05-09 21:43:30,306:__main__:Pecenttage of active values: 0    96.2384
+1     3.7616
+Name: Active, dtype: float64
+2021-05-09 21:43:31,351:__main__:Training on fold 1/10...
+2021-05-09 21:45:04,423:__main__:Training on fold 2/10...
+2021-05-09 21:48:14,490:__main__:Pecenttage of active values: 0    96.2384
+1     3.7616
+Name: Active, dtype: float64
+2021-05-09 21:48:15,628:__main__:Training on fold 1/10...
+2021-05-09 21:49:42,698:__main__:Training on fold 2/10...
+2021-05-09 21:51:51,965:__main__:4853
+2021-05-09 21:54:28,978:__main__:Pecenttage of active values: 0    96.2384
+1     3.7616
+Name: Active, dtype: float64
+2021-05-09 21:54:30,092:__main__:Training on fold 1/10...
+2021-05-09 21:57:31,670:__main__:Training on fold 2/10...
+2021-05-09 22:01:08,521:__main__:3973
+2021-05-09 22:15:57,267:__main__:Pecenttage of active values: 0    96.2384
+1     3.7616
+Name: Active, dtype: float64
+2021-05-09 22:15:58,756:__main__:Training on fold 1/10...
+2021-05-09 22:19:13,215:__main__:Training on fold 2/10...
+2021-05-09 22:33:22,319:__main__:Pecenttage of active values: 0    96.2384
+1     3.7616
+Name: Active, dtype: float64
+2021-05-09 22:34:13,148:__main__:Pecenttage of active values: 0    96.2384
+1     3.7616
+Name: Active, dtype: float64
+2021-05-09 22:40:24,440:__main__:Pecenttage of active values: 0    96.2384
+1     3.7616
+Name: Active, dtype: float64
+2021-05-09 22:43:49,775:__main__:4938
+2021-05-09 22:46:50,195:__main__:Pecenttage of active values: 0    96.2384
+1     3.7616
+Name: Active, dtype: float64
+2021-05-09 22:48:17,142:__main__:Pecenttage of active values: 0    96.2384
+1     3.7616
+Name: Active, dtype: float64
+2021-05-09 22:48:32,617:__main__:Pecenttage of active values: 0    96.2384
+1     3.7616
+Name: Active, dtype: float64
+2021-05-09 22:54:38,735:__main__:3227
+2021-05-09 22:58:46,821:__main__:Pecenttage of active values: 0    96.2384
+1     3.7616
+Name: Active, dtype: float64
+2021-05-09 22:59:13,658:__main__:Pecenttage of active values: 0    96.2384
+1     3.7616
+Name: Active, dtype: float64
+2021-05-09 23:04:56,176:__main__:Pecenttage of active values: 0    96.2384
+1     3.7616
+Name: Active, dtype: float64
+2021-05-09 23:08:53,826:__main__:2485
