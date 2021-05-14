@@ -1,52 +1,99 @@
-2021-05-09 21:43:30,306:__main__:Pecenttage of active values: 0    96.2384
-1     3.7616
-Name: Active, dtype: float64
-2021-05-09 21:43:31,351:__main__:Training on fold 1/10...
-2021-05-09 21:45:04,423:__main__:Training on fold 2/10...
-2021-05-09 21:48:14,490:__main__:Pecenttage of active values: 0    96.2384
-1     3.7616
-Name: Active, dtype: float64
-2021-05-09 21:48:15,628:__main__:Training on fold 1/10...
-2021-05-09 21:49:42,698:__main__:Training on fold 2/10...
-2021-05-09 21:51:51,965:__main__:4853
-2021-05-09 21:54:28,978:__main__:Pecenttage of active values: 0    96.2384
-1     3.7616
-Name: Active, dtype: float64
-2021-05-09 21:54:30,092:__main__:Training on fold 1/10...
-2021-05-09 21:57:31,670:__main__:Training on fold 2/10...
-2021-05-09 22:01:08,521:__main__:3973
-2021-05-09 22:15:57,267:__main__:Pecenttage of active values: 0    96.2384
-1     3.7616
-Name: Active, dtype: float64
-2021-05-09 22:15:58,756:__main__:Training on fold 1/10...
-2021-05-09 22:19:13,215:__main__:Training on fold 2/10...
-2021-05-09 22:33:22,319:__main__:Pecenttage of active values: 0    96.2384
-1     3.7616
-Name: Active, dtype: float64
-2021-05-09 22:34:13,148:__main__:Pecenttage of active values: 0    96.2384
-1     3.7616
-Name: Active, dtype: float64
-2021-05-09 22:40:24,440:__main__:Pecenttage of active values: 0    96.2384
-1     3.7616
-Name: Active, dtype: float64
-2021-05-09 22:43:49,775:__main__:4938
-2021-05-09 22:46:50,195:__main__:Pecenttage of active values: 0    96.2384
-1     3.7616
-Name: Active, dtype: float64
-2021-05-09 22:48:17,142:__main__:Pecenttage of active values: 0    96.2384
-1     3.7616
-Name: Active, dtype: float64
-2021-05-09 22:48:32,617:__main__:Pecenttage of active values: 0    96.2384
-1     3.7616
-Name: Active, dtype: float64
-2021-05-09 22:54:38,735:__main__:3227
-2021-05-09 22:58:46,821:__main__:Pecenttage of active values: 0    96.2384
-1     3.7616
-Name: Active, dtype: float64
-2021-05-09 22:59:13,658:__main__:Pecenttage of active values: 0    96.2384
-1     3.7616
-Name: Active, dtype: float64
-2021-05-09 23:04:56,176:__main__:Pecenttage of active values: 0    96.2384
-1     3.7616
-Name: Active, dtype: float64
-2021-05-09 23:08:53,826:__main__:2485
+2021-05-13 20:28:12,749:__main__:Pecentage of active values: 3.76
+2021-05-13 20:28:13,547:__main__:None
+2021-05-13 20:29:38,531:__main__:F1 validation score is : 0.8543793659322944
+2021-05-13 20:29:39,255:__main__:The percentage of predicted active proteins is: 5.0
+2021-05-13 20:29:39,315:__main__:Results successfully saved, program finished.
+2021-05-13 20:30:40,522:__main__:Pecentage of active values: 3.76
+2021-05-13 20:30:41,310:__main__:None
+2021-05-13 20:32:11,019:__main__:F1 validation score is : 0.8695652173913042
+2021-05-13 20:32:11,682:__main__:The percentage of predicted active proteins is: 5.0
+2021-05-13 20:32:11,738:__main__:Results successfully saved, program finished.
+2021-05-13 20:33:05,520:__main__:Pecentage of active values: 3.76
+2021-05-13 20:33:06,313:__main__:None
+2021-05-13 20:34:28,053:__main__:Pecentage of active values: 3.76
+2021-05-13 20:34:28,838:__main__:None
+2021-05-13 20:34:40,293:__main__:F1 validation score is : 0.7702386523163314
+2021-05-13 20:34:40,935:__main__:The percentage of predicted active proteins is: 6.0
+2021-05-13 20:34:40,990:__main__:Results successfully saved, program finished.
+2021-05-13 20:35:39,474:__main__:Pecentage of active values: 3.76
+2021-05-13 20:35:40,301:__main__:None
+2021-05-13 20:35:51,611:__main__:F1 validation score is : 0.018801410105757935
+2021-05-13 20:35:52,227:__main__:The percentage of predicted active proteins is: 0.0
+2021-05-13 20:35:52,280:__main__:Results successfully saved, program finished.
+2021-05-13 20:36:11,549:__main__:Pecentage of active values: 3.76
+2021-05-13 20:36:12,330:__main__:None
+2021-05-13 20:36:23,504:__main__:F1 validation score is : 0.11607142857142858
+2021-05-13 20:36:24,137:__main__:The percentage of predicted active proteins is: 0.0
+2021-05-13 20:36:24,194:__main__:Results successfully saved, program finished.
+2021-05-13 20:36:51,342:__main__:Pecentage of active values: 3.76
+2021-05-13 20:36:52,122:__main__:None
+2021-05-13 20:37:04,410:__main__:F1 validation score is : 0.0
+2021-05-13 20:37:05,479:__main__:The percentage of predicted active proteins is: 0.0
+2021-05-13 20:37:05,536:__main__:Results successfully saved, program finished.
+2021-05-13 20:37:09,695:__main__:Pecentage of active values: 3.76
+2021-05-13 20:37:10,517:__main__:None
+2021-05-13 20:37:50,943:__main__:Pecentage of active values: 3.76
+2021-05-13 20:37:51,734:__main__:None
+2021-05-13 20:38:26,048:__main__:Pecentage of active values: 3.76
+2021-05-13 20:38:26,847:__main__:None
+2021-05-13 20:39:04,881:__main__:Pecentage of active values: 3.76
+2021-05-13 20:39:05,661:__main__:None
+2021-05-13 20:39:55,658:__main__:F1 validation score is : 0.8602981778023191
+2021-05-13 20:39:56,302:__main__:The percentage of predicted active proteins is: 4.0
+2021-05-13 20:39:56,357:__main__:Results successfully saved, program finished.
+2021-05-13 20:40:25,326:__main__:Pecentage of active values: 3.76
+2021-05-13 20:40:26,110:__main__:None
+2021-05-13 20:40:38,662:__main__:F1 validation score is : 0.7872832369942196
+2021-05-13 20:40:39,275:__main__:The percentage of predicted active proteins is: 4.0
+2021-05-13 20:40:39,328:__main__:Results successfully saved, program finished.
+2021-05-13 20:41:20,616:__main__:Pecentage of active values: 3.76
+2021-05-13 20:41:21,536:__main__:None
+2021-05-13 20:41:36,835:__main__:Pecentage of active values: 3.76
+2021-05-13 20:41:37,639:__main__:None
+2021-05-13 20:41:46,938:__main__:F1 validation score is : 0.7681498829039812
+2021-05-13 20:41:47,551:__main__:The percentage of predicted active proteins is: 6.0
+2021-05-13 20:41:47,609:__main__:Results successfully saved, program finished.
+2021-05-13 20:42:19,769:__main__:Pecentage of active values: 3.76
+2021-05-13 20:42:20,561:__main__:None
+2021-05-13 20:42:33,292:__main__:F1 validation score is : 0.7871939736346516
+2021-05-13 20:42:33,901:__main__:The percentage of predicted active proteins is: 3.0
+2021-05-13 20:42:33,956:__main__:Results successfully saved, program finished.
+2021-05-13 20:42:46,881:__main__:Pecentage of active values: 3.76
+2021-05-13 20:42:47,662:__main__:None
+2021-05-13 20:43:00,188:__main__:F1 validation score is : 0.774496015002344
+2021-05-13 20:43:00,789:__main__:The percentage of predicted active proteins is: 6.0
+2021-05-13 20:43:00,844:__main__:Results successfully saved, program finished.
+2021-05-13 20:43:39,003:__main__:Pecentage of active values: 3.76
+2021-05-13 20:43:39,789:__main__:None
+2021-05-13 20:43:52,573:__main__:F1 validation score is : 0.8065984072810011
+2021-05-13 20:43:53,184:__main__:The percentage of predicted active proteins is: 4.0
+2021-05-13 20:43:53,236:__main__:Results successfully saved, program finished.
+2021-05-13 20:44:39,319:__main__:Pecentage of active values: 3.76
+2021-05-13 20:44:40,097:__main__:None
+2021-05-13 20:44:52,571:__main__:F1 validation score is : 0.8048639258830341
+2021-05-13 20:44:53,202:__main__:The percentage of predicted active proteins is: 4.0
+2021-05-13 20:44:53,257:__main__:Results successfully saved, program finished.
+2021-05-13 20:45:39,932:__main__:Pecentage of active values: 3.76
+2021-05-13 20:45:40,733:__main__:None
+2021-05-13 20:45:51,245:__main__:Pecentage of active values: 3.76
+2021-05-13 20:45:52,041:__main__:None
+2021-05-13 20:47:01,463:__main__:Pecentage of active values: 3.76
+2021-05-13 20:47:02,245:__main__:None
+2021-05-13 20:47:40,236:__main__:F1 validation score is : 0.851528384279476
+2021-05-13 20:47:41,090:__main__:The percentage of predicted active proteins is: 4.0
+2021-05-13 20:47:41,149:__main__:Results successfully saved, program finished.
+2021-05-13 20:48:29,684:__main__:Pecentage of active values: 3.76
+2021-05-13 20:48:30,484:__main__:None
+2021-05-13 20:48:39,863:__main__:F1 validation score is : 0.7622119815668202
+2021-05-13 20:48:40,481:__main__:The percentage of predicted active proteins is: 6.0
+2021-05-13 20:48:40,535:__main__:Results successfully saved, program finished.
+2021-05-13 20:48:53,404:__main__:Pecentage of active values: 3.76
+2021-05-13 20:48:54,186:__main__:None
+2021-05-13 20:49:06,676:__main__:F1 validation score is : 0.791887976822791
+2021-05-13 20:49:07,275:__main__:The percentage of predicted active proteins is: 6.0
+2021-05-13 20:49:07,327:__main__:Results successfully saved, program finished.
+2021-05-13 20:49:41,351:__main__:Pecentage of active values: 3.76
+2021-05-13 20:49:42,142:__main__:None
+2021-05-13 20:52:03,002:__main__:F1 validation score is : 0.8756274400446179
+2021-05-13 20:52:03,656:__main__:The percentage of predicted active proteins is: 4.0
+2021-05-13 20:52:03,712:__main__:Results successfully saved, program finished.
