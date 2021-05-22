@@ -20,6 +20,7 @@ import cv2
 
 import random
 from sklearn.model_selection import train_test_split
+from keras.models import load_model
 
 # # from google.colab import files
 # import io
@@ -52,18 +53,18 @@ from matplotlib import pyplot as plt
 """FUNCTION DEFINITIONS"""
 
 
-# def similar_dish(prediction):
-#     out = [0] * len(prediction)
-#     for idx, vec in enumerate(prediction):
-#         anchor, positive, negative = vec[:SIZE_BOTTLENECK], vec[SIZE_BOTTLENECK:2 * SIZE_BOTTLENECK], vec[
-#                                                                                                       2 * SIZE_BOTTLENECK:]
-#         positive_dist = np.mean(np.square(anchor - positive))
-#         negative_dist = np.mean(np.square(anchor - negative))
-#         if positive_dist < negative_dist:
-#             out[idx] = 1
-#         else:
-#             out[idx] = 0
-#     return out
+def similar_dish(prediction):
+    out = [0] * len(prediction)
+    for idx, vec in enumerate(prediction):
+        anchor, positive, negative = vec[:SIZE_BOTTLENECK], vec[SIZE_BOTTLENECK:2 * SIZE_BOTTLENECK], vec[
+                                                                                                      2 * SIZE_BOTTLENECK:]
+        positive_dist = np.mean(np.square(anchor - positive))
+        negative_dist = np.mean(np.square(anchor - negative))
+        if positive_dist < negative_dist:
+            out[idx] = 1
+        else:
+            out[idx] = 0
+    return out
 
 
 # # less memory intense way of creating predictions
@@ -165,7 +166,7 @@ from matplotlib import pyplot as plt
 #         plt.yticks([])
 #     plt.show()
 
-def create_batch(fold, img_dict, batch_size=16, toSize=(10, 10), flatten=True):
+def create_batch(fold, img_dict, batch_size=16, toSize=(100, 100), flatten=False):
     if flatten:
         # toSize = img_dict[0][0].shape
         x_anchors = np.zeros((batch_size, toSize[0] * toSize[1] * 3))
@@ -181,7 +182,7 @@ def create_batch(fold, img_dict, batch_size=16, toSize=(10, 10), flatten=True):
         # We need to find an anchor, a positive example and a negative example
         random_index = random.randint(0, fold.shape[0] - 1)
         triplet = fold[random_index]
-        logger.debug(f"Triplet: {triplet}")
+        # logger.debug(f"Triplet: {triplet}")
         # reshaping, normalizing and flattening images --> this will take more time than pre-processed data, but will eliminate RAM issues
         try:
             # x_anchor = cv2.resize(img_dict[int(triplet[0])], toSize) / 255.0
@@ -208,7 +209,7 @@ def data_generator(fold, img_dict, batch_size=4, toSize=(100,100), flatten=True)
     while True:
         X = create_batch(fold, img_dict, batch_size, toSize, flatten)
         y = np.zeros((batch_size, 3 * SIZE_BOTTLENECK))
-        logger.debug(f"Generator called with shape {np.array(X).shape}")
+        # logger.debug(f"Generator called with shape {np.array(X).shape}")
         yield X, y
 
 def get_pp_images(img_size = [100,100], maxImages=10000, img_path=None,  force_recompute=False, savePP = True):  # TODO: Improve reading images with LMDB and HDF5
@@ -289,7 +290,7 @@ class siameseNetwork():
         self.imgSize = imgSize
         self.get_network()
         self.trainingData = None
-        self.trained_model = None
+        # self.trained_model = None
     def embedding_model(self):
         embedding_model = keras.Sequential()
         embedding_model.add(keras.Input(shape=(IMG_SIZE_IN[1], IMG_SIZE_IN[0], 3)))
@@ -322,15 +323,17 @@ class siameseNetwork():
         # keras.losses.custom_loss = self.triplet_loss
         # if loss:
         #     loss = self.triplet_loss()
-        # keras.losses.custom_loss = triplet_loss
+        keras.losses.custom_loss = triplet_loss
 
         self.net.compile(loss = triplet_loss, optimizer = 'adamax')  #TODO: Change optimizer to 'adamax' + define custom loss to be triplet loss
         try:
-            self.trained_model = self.net.fit(data_generator(data_in, img_dict, batch_size = batch_size, flatten=False), epochs=epochs, steps_per_epoch = math.floor(data_in.shape[0] / batch_size))
+            self.net.fit(data_generator(data_in, img_dict, batch_size = batch_size, flatten=False), epochs=epochs, steps_per_epoch = math.floor(data_in.shape[0] / batch_size))
             self.timeCompleted = int(time.time())
             readableTime = str(datetime.datetime.fromtimestamp(self.timeCompleted).strftime('%c'))
             logger.info(f'Finished training at {readableTime}')
         except:
+            file_path = os.path.join('models', f"interrupted_model_{self.timeCompleted}.h5")
+            self.net.save_weights(file_path)
             logger.exception("Siamese Network failed to train!")
 
         if saveModel:
@@ -338,12 +341,75 @@ class siameseNetwork():
 
     def saveModel(self):
         try:
-            file_name = os.path.join('models', f"model_{self.timeCompleted}")
-            with open(file_name, "wb") as output_file:
-                pickle.dump(self.trained_model, output_file)
-            logger.info(f"Model saved successfully to Pickle file")
+            file_path = os.path.join('models', f"model_{self.timeCompleted}.h5")
+            # file_path_weights = os.path.join('models', f"model_weights_{self.timeCompleted}.h5")
+            logger.debug(f"File name: {file_path}")
+            self.net.save(file_path)
+            # self.net.save_weights(file_path_weights)
+            # tf.keras.models.save_model(self.net, file_path)
+            logger.info(f"Model was saved successfully.")
+        except FileNotFoundError:
+            logger.error(f"Model failed to save to file, because file was not found")
         except:
-            logger.error(f"Model failed to save to pickle file")
+            logger.exception(f"Failed to save model!")
+
+    def loadModel(self):
+        pass
+
+    def inference(self, data, imgDict, savePredictions = True, path = None):
+        # generator to avoid having to load everything into memory
+        inferenceGenerator = ([np.array([imgDict[triplet[0]]/255.0]), np.array([imgDict[triplet[1]]/255.0]), np.array([imgDict[triplet[2]]/255.0])] for triplet in data)  #TODO: Numpy array conversions to be done in preprocessing steps
+
+        # logger.debug(f"{next(inferenceGenerator)}")
+
+        X_b = create_batch(data[:4], imgDict)
+        logger.debug(f"Shape of create_batch: {np.array(X_b).shape}")
+        logger.debug(f"Type of create_patch {type(X_b)}")
+
+        try:
+            logger.info(f"Inference started ...")
+            # self.net.predict(inferenceGenerator)
+            X = [np.array([imgDict[0] / 255.0]), np.array([imgDict[15] / 255.0]), np.array([imgDict[1000] / 255.0])]
+            logger.debug(f"Predict input shape: {np.array(X).shape}")
+            logger.debug(f"Type of my input {type(X)}")
+            logger.debug(f"Image shape: {(imgDict[0]/255.0).shape}")
+            logger.debug(f"inference shape: {np.array(next(inferenceGenerator)).shape}")
+            self.predictions = self.net.predict_generator(inferenceGenerator)
+            # self.net.predict(X)
+        except:
+            logger.exception(f"Inference failed!")
+
+        if savePredictions:
+            self.savePredictions(path)
+
+    def savePredictions(self, path = None):
+        if path == None:
+            file_path = os.path.join('results', f"results_{int(time.time())}")
+        else:
+            file_path = path
+
+        try:
+            sv_pr = similar_dish(self.predictions)
+            np.savetxt(file_path, sv_pr, fmt='%i')
+            logger.info("The predictions were successfully saved ... ")
+        except:
+            logger.exception("The predictions couldn't be saved!")
+
+
+    def loadLatestModel(self):
+        model_path = os.path.join('models', max(os.listdir('./models')))
+        logger.info(f"Model Path: {model_path}")
+        try:
+            self.net = load_model(model_path, custom_objects={"triplet_loss": triplet_loss})
+            self.net.summary()
+            logger.info(f"Successfully loaded in model {model_path}")
+        except FileNotFoundError:
+
+            logger.error(f"Model was not found: {model_path} does not exist")
+        except:
+            logger.exception(f"Latest Model could not be loaded!")
+        return self.net
+
 
 if __name__ == "__main__":
 
@@ -352,9 +418,9 @@ if __name__ == "__main__":
     SIZE_BOTTLENECK = 50
     ALPHA = 1.0 # margin for triplet loss
     BATCH_SIZE = 64
-    EPOCHS = 1
-    LOG_LEVEL = logging.INFO
-    INPUT_ON = False # if False the user can intervene using inputs
+    EPOCHS = 10
+    LOG_LEVEL = logging.DEBUG
+    INPUT_ON = True # if False the user can intervene using inputs
     TEST_SIZE = 0.2
 
     """Importing and preprocessing"""
@@ -381,6 +447,7 @@ if __name__ == "__main__":
     # t_test = np.shape(X_test_df)[0]
 
     X = np.array(X_df)  # TODO: create a validation set
+    X_pred = np.array(X_predict_df)
     y = np.ones(X.shape[0])
 
     X_train, X_val, y_train, y_val= train_test_split(X, y, test_size=TEST_SIZE, random_state=1)
@@ -388,7 +455,10 @@ if __name__ == "__main__":
     if INPUT_ON and input("Do you want to perform inference only?: YES for INFERENCE Y/N: ").lower() in ['y','yes','1']:
         # TODO: import model and create inference
         logger.info(f"INFERENCE ONLY ... ")
-        pass
+        net = siameseNetwork(IMG_SIZE_IN)
+        net.loadLatestModel()
+
+        net.inference(X_pred, img_dic, savePredictions=True)
     else:
         logger.info(f"TRAINING and INFERENCE ... ")
 
@@ -396,9 +466,14 @@ if __name__ == "__main__":
         net.get_model_summary()
         net.train(X_train, img_dic, epochs=EPOCHS)
 
+        # file_path = os.path.join('results', f"results_{int(time.time())}")
+        # predicted_embeddings = net.inference(X_pred, img_dic)
+        # sv_pr = similar_dish(predicted_embeddings)
+        # np.savetxt(file_path, sv_pr, fmt='%i', )
+
         # dg = data_generator(X_train, img_dic)
         # logger.debug(len(next(dg)))
-        logger.info(f"Training and INFERENCE ENDED")
+        logger.info(f"Training and Inference ended.")
 
 
 
@@ -439,23 +514,8 @@ if __name__ == "__main__":
 
 
 
-# # # saving as pickle object
-# # pickle_out = open("net.pickle","wb")
-# # pickle.dump(result, pickle_out)
-# # pickle_out.close()
 
-# # import keras.losses
-# # keras.losses.custom_loss = triplet_loss
 
-# # from keras.models import load_model
-# import datetime
-# now = datetime.datetime.now()
-
-# description = input('optional file description: ')
-
-# filepath = f'{workDir}/models/{round(now.timestamp())}_sb_model_{description}.h5'
-# print(filepath)
-# net.save(filepath)
 
 # """# Test predictions & save results"""
 
