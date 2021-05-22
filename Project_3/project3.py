@@ -76,13 +76,13 @@ class Model_Connected():
         self.opt = keras.optimizers.Adam()  # alternative: opt = SGD(lr=0.01, momentum=0.9)
 
     def compile(self):
-        self.model.compile(optimizer=self.opt, loss="binary_crossentropy", metrics=['accuracy', get_f1])  # f1 score should be off the shelf with sklearn
+        self.model.compile(optimizer=self.opt, loss="binary_crossentropy", metrics=['accuracy', 'recall', get_f1])  # f1 score should be off the shelf with sklearn
         # self.model.compile(optimizer=self.opt, loss='mean_squared_error', metrics=['accuracy', get_f1])
         return self.model
 
 if __name__ == "__main__":
     # defining global variables
-    NEPOCHS = 200
+    NEPOCHS = 100
     BATCHSIZE = 500
     VALIDATIONSPLIT = 0.2
     HIDDENSIZE = 500
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     logger.debug("Model compile start...")
     model = model_inst.compile()
     logger.debug("Model train start ...")
-    callback = tf.keras.callbacks.EarlyStopping(monitor='val_get_f1',  patience=40, mode="max", min_delta=0.01)
+    callback = tf.keras.callbacks.EarlyStopping(monitor='val_get_f1',  patience=5, mode="max", restore_best_weights=True, min_delta=0.01)
     model.fit(X_train_hot, y_train, validation_data = (X_val_hot, y_val), epochs = NEPOCHS, batch_size=BATCHSIZE, verbose = VERBOSE, class_weight = weight, callbacks=[callback])
     # predictions
     logger.debug("Checking validation score...")

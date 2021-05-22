@@ -97,3 +97,8 @@
 2021-05-13 20:52:03,002:__main__:F1 validation score is : 0.8756274400446179
 2021-05-13 20:52:03,656:__main__:The percentage of predicted active proteins is: 4.0
 2021-05-13 20:52:03,712:__main__:Results successfully saved, program finished.
+2021-05-13 20:57:58,325:__main__:Pecentage of active values: 3.76
+2021-05-13 20:57:59,166:__main__:None
+2021-05-13 21:05:13,441:__main__:F1 validation score is : 0.8922190201729107
+2021-05-13 21:05:14,246:__main__:The percentage of predicted active proteins is: 4.0
+2021-05-13 21:05:14,312:__main__:Results successfully saved, program finished.

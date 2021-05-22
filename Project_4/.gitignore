@@ -1,0 +1,6 @@
+*.png
+*.log
+data
+doc
+results
+*.idea*
