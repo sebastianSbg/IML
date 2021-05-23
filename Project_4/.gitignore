@@ -1,9 +1,10 @@
 *.png
 *.log
-data
+data/*
 doc
-results
+results/*
 *.idea*
 *.h5
 data_old
 trial.py
+log/*
