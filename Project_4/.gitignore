@@ -4,3 +4,6 @@ data
 doc
 results
 *.idea*
+*.h5
+data_old
+trial.py
